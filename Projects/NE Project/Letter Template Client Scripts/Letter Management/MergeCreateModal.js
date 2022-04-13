@@ -10,7 +10,7 @@ script.src = '/bundles/bootstrapjs?v=FBul99mpojQQrPqNoqXHNBuItkZ_0pqoo9DoBnPB5pQ
 document.head.appendChild(script);
 
 var style = document.createElement('style');
-style.innerHTML = '.close { vertical-align:middle;}';  //You can put css styles into this section.
+style.innerHTML = '.close { vertical-align:middle;} .modal-content {max-height:700px;}';  //You can put css styles into this section.
 
 document.head.appendChild(style);
 

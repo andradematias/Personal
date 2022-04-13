@@ -1,30 +1,25 @@
-//Populate Fields On Load client side script for Certification
-var CallServerSide = function () {
+//LetterManagementRetrieveUserInfo for Letter Management
+const CallServerSide = function () {
 
     VV.Form.ShowLoadingPanel();
     //This gets all of the form fields.
-    var formData = VV.Form.getFormDataCollection();
+    let formData = VV.Form.getFormDataCollection();
 
-    // var FormInfo = {};
-    // FormInfo.name = 'REVISIONID';
-    // FormInfo.value = VV.Form.DataID;
-    // formData.push(FormInfo);
-
-    var FormInfo = {};
-    FormInfo.name = 'USERID';
-    FormInfo.value = VV.Form.VV.currentUser.UsId;
+    let FormInfo = {};
+    FormInfo.name = 'REVISIONID';
+    FormInfo.value = VV.Form.DataID;
     formData.push(FormInfo);
 
-    // var URLInfo = {};
-    // URLInfo.name = 'baseURL';
-    // URLInfo.value = VV.BaseAppUrl;
-    // formData.push(URLInfo);
+    let UserInfo = {};
+    UserInfo.name = 'USERID';
+    UserInfo.value = VV.Form.FormUsID;
+    formData.push(UserInfo);
 
     //Following will prepare the collection and send with call to server side script.
-    var data = JSON.stringify(formData);
-    var requestObject = $.ajax({
+    const data = JSON.stringify(formData);
+    const requestObject = $.ajax({
         type: "POST",
-        url: VV.BaseAppUrl + 'api/v1/' + VV.CustomerAlias + '/' + VV.CustomerDatabaseAlias + '/scripts?name=PopulateFieldsOnLoad',
+        url: VV.BaseAppUrl + 'api/v1/' + VV.CustomerAlias + '/' + VV.CustomerDatabaseAlias + '/scripts?name=LetterManagementRetrieveUserInfo',
         contentType: "application/json; charset=utf-8",
         data: data,
         success: '',
@@ -39,9 +34,14 @@ VV.Form.ShowLoadingPanel();
 $.when(
     CallServerSide()
 ).always(function (resp) {
-    console.log(resp);
+    //console.log(resp);
+    if ('' == VV.Form.GetFieldValue('Letter HTML')) {
+        VV.Form.SetFieldValue('Letter HTML', VV.Form.GetFieldValue('Default Template Content'), false)
+        VV.Form.SetFieldValue('Subject of Template', 'General Notification');
+    }
+
     VV.Form.HideLoadingPanel();
-    var messageData = '';
+    let messageData = '';
     if (typeof (resp.status) != 'undefined') {
         messageData = "A status code of " + resp.status + " returned from the server.  There is a communication problem with the  web servers.  If this continues, please contact the administrator and communicate to them this message and where it occurred.";
         VV.Form.Global.DisplayMessaging(messageData);
@@ -53,15 +53,17 @@ $.when(
     else if (resp.meta.status == '200') {
         if (resp.data[0] != 'undefined') {
             if (resp.data[0] == 'Success') {
+                /*
+                Legend:
+                resp.data[1] = Array List of "State Staff", "Job Leadership" and "Individual Info" objects
+                */
 
-                var loadData = resp.data[2];
+                //The tokens are already set using a template function that runs through the Array of objects that arrives from the Web service
+                const tokens = VV.Form.Template.PopulateDataTokens(resp.data[1]);
+                VV.Form.SetFieldValue('Formatted Data Tokens', tokens);
 
-                //Set field values with data pulled from the Individual 
-                VV.Form.SetFieldValue('Individual ID', loadData['Form ID']);
-                VV.Form.SetFieldValue('User ID', loadData['Email Address']);
-                //Build folder path
-                var newPath = VV.Form.Global.BuildUploadFolderPath(loadData['Form ID']);
-                VV.Form.SetFieldValue('UploadFolder', newPath);
+                //The tokens are set in this field in string format to be able to merge with the tokens of the letter
+                VV.Form.SetFieldValue('Data Tokens', JSON.stringify(resp.data[1]));
             }
             else if (resp.data[0] == 'Error') {
                 messageData = 'An error was encountered. ' + resp.data[1];
@@ -70,7 +72,7 @@ $.when(
                 alert(messageData);
             }
             else {
-                messageData = 'An unhandled response occurred when calling PopulateFieldsOnLoad. The form will not save at this time.  Please try again or communicate this issue to support.';
+                messageData = 'An unhandled response occurred when calling LetterManagementRetrieveUserInfo. The form will not save at this time.  Please try again or communicate this issue to support.';
                 VV.Form.HideLoadingPanel();
                 //VV.Form.Global.DisplayMessaging(messageData);
                 alert(messageData);

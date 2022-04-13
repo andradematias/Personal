@@ -2,11 +2,11 @@
 VV.Form.Template.CheckUserGroup();
 VV.Form.SetFieldValue('Tab Control', 'Letter');
 
-var userID = VV.Form.GetFieldValue('User ID');
-var IndividualID = VV.Form.GetFieldValue('Individual ID');
-var isFill = VV.Form.Global.IsFillAndRelate();
-var uploadPath = VV.Form.GetFieldValue('UploadFolder');
-var licenseType = VV.Form.GetFieldValue('License Type')
+const userID = VV.Form.GetFieldValue('User ID');
+const IndividualID = VV.Form.GetFieldValue('Individual ID');
+const isFill = VV.Form.Global.IsFillAndRelate();
+const uploadPath = VV.Form.GetFieldValue('UploadFolder');
+const licenseType = VV.Form.GetFieldValue('License Type')
 
 //Set License Type to All by Default
 if (!VV.Form.IsFormSaved && isNull(licenseType)) {
@@ -17,7 +17,7 @@ if (userID.length == 0 && !isFill) {
     VV.Form.Template.PopulateFields();
 }
 else if (uploadPath == '') {
-    var newPath = VV.Form.Global.BuildUploadFolderPath(IndividualID)
+    const newPath = VV.Form.Global.BuildUploadFolderPath(IndividualID)
     VV.Form.SetFieldValue('UploadFolder', newPath);
 }
 
@@ -33,13 +33,13 @@ VV.Form.Global.DocumentCreateModal();
 // Groups and conditions manages the visibility
 VV.Form.SetFieldValue('User Groups', VV.Form.FormUserGroups[0])
 
-var formSaved = VV.Form.IsFormSaved
+const formSaved = VV.Form.IsFormSaved
 
 if (formSaved) {
     VV.Form.SetFieldValue('Form Saved', 'True', true)
 }
 
-VV.Form.Template.RetrieveUserInfo();
+//VV.Form.Template.RetrieveUserInfo();
 
 VV.Form.SetFieldValue('Communication Type', 'Email');
 

@@ -5,7 +5,7 @@ VV.Form.DoAjaxFormSave().then(function () {
     VV.Form.SetFieldValue('Form Saved', 'True');
 
     if (window.opener && window.opener.VV) {
-        var parentFormID = window.opener.VV.Form.GetFieldValue('Form ID');
+        let parentFormID = window.opener.VV.Form.GetFieldValue('Form ID');
         // reload RRC for parent form
         if (parentFormID.startsWith('LICENSE-DETAILS')) {
             window.opener.VV.Form.ReloadRepeatingRowControl('RRC_LetterManagement');

@@ -1,28 +1,28 @@
 //LetterManagementSendEmail for Letter Management
-var CallServerSide = function () {
+const CallServerSide = function () {
 
     VV.Form.ShowLoadingPanel();
     //This gets all of the form fields.
-    var formData = VV.Form.getFormDataCollection();
+    const formData = VV.Form.getFormDataCollection();
 
-    var FormInfo = {};
+    let FormInfo = {};
     FormInfo.name = 'REVISIONID';
     FormInfo.value = VV.Form.DataID;
     formData.push(FormInfo);
 
-    var FormInfo = {};
-    FormInfo.name = 'USERID';
-    FormInfo.value = VV.Form.FormUsID;
-    formData.push(FormInfo);
+    let UserInfo = {};
+    UserInfo.name = 'USERID';
+    UserInfo.value = VV.Form.FormUsID;
+    formData.push(UserInfo);
 
-    var URLInfo = {};
+    let URLInfo = {};
     URLInfo.name = 'baseURL';
     URLInfo.value = VV.BaseURL;
     formData.push(URLInfo);
 
     //Following will prepare the collection and send with call to server side script.
-    var data = JSON.stringify(formData);
-    var requestObject = $.ajax({
+    const data = JSON.stringify(formData);
+    const requestObject = $.ajax({
         type: "POST",
         url: VV.BaseAppUrl + 'api/v1/' + VV.CustomerAlias + '/' + VV.CustomerDatabaseAlias + '/scripts?name=LetterManagementSendEmail',
         contentType: "application/json; charset=utf-8",
@@ -41,7 +41,7 @@ $.when(
 ).always(function (resp) {
     console.log(resp);
     VV.Form.HideLoadingPanel();
-    var messageData = '';
+    let messageData = '';
     if (typeof (resp.status) != 'undefined') {
         messageData = "A status code of " + resp.status + " returned from the server.  There is a communication problem with the  web servers.  If this continues, please contact the administrator and communicate to them this message and where it occurred.";
         VV.Form.Global.DisplayMessaging(messageData);
@@ -54,7 +54,7 @@ $.when(
         if (resp.data[0] != 'undefined') {
             if (resp.data[0] == 'Success') {
 
-                var formURL = VV.BaseAppUrl + "FormViewer/app?DataID=" + resp.data[2] + "&hidemenu=true&xcid=bbf860ac-4f45-eb11-81f5-912ea5398475&xcdid=419017bf-4f45-eb11-81f5-912ea5398475"
+                const formURL = VV.BaseAppUrl + "FormViewer/app?DataID=" + resp.data[2] + "&hidemenu=true&xcid=bbf860ac-4f45-eb11-81f5-912ea5398475&xcdid=419017bf-4f45-eb11-81f5-912ea5398475"
 
                 console.log(formURL);
 
