@@ -57,28 +57,30 @@ module.exports.main = async function (ffCollection, vvClient, response) {
     let errorLog = [];
     let EmailArray = [];
 
+
+    /****************
+     Helper Functions
+    *****************/
+    // Check if field object has a value property and that value is truthy before returning value.
+    function getFieldValueByName(fieldName, isOptional) {
+        try {
+            let fieldObj = ffCollection.getFormFieldByName(fieldName);
+            let fieldValue = fieldObj && (fieldObj.hasOwnProperty('value') ? fieldObj.value : null);
+
+            if (fieldValue === null && !isOptional) {
+                throw new Error(`${fieldName}`);
+            }
+            if (!isOptional && !fieldValue) {
+                throw new Error(`${fieldName}`);
+            }
+            return fieldValue;
+        } catch (error) {
+            errorLog.push(error.message);
+        }
+    }
+
     try {
 
-        /****************
-         Helper Functions
-        *****************/
-        // Check if field object has a value property and that value is truthy before returning value.
-        function getFieldValueByName(fieldName, isOptional) {
-            try {
-                let fieldObj = ffCollection.getFormFieldByName(fieldName);
-                let fieldValue = fieldObj && (fieldObj.hasOwnProperty('value') ? fieldObj.value : null);
-
-                if (fieldValue === null && !isOptional) {
-                    throw new Error(`${fieldName}`);
-                }
-                if (!isOptional && !fieldValue) {
-                    throw new Error(`${fieldName}`);
-                }
-                return fieldValue;
-            } catch (error) {
-                errorLog.push(error.message);
-            }
-        }
 
         /*********************
          Form Record Variables
@@ -95,6 +97,7 @@ module.exports.main = async function (ffCollection, vvClient, response) {
         let Recipient = getFieldValueByName('Recipient Email', true);
         //let Tokens = getFieldValueByName('Tokens');
         let CommType = getFieldValueByName('Communication Type');
+        let IDToPass = "";
 
         if (LicenseID) {
             IDToPass = LicenseID;

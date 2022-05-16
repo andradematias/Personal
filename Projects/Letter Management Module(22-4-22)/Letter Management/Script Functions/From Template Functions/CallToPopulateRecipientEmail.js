@@ -1,4 +1,4 @@
-//LetterManagementRetrieveUserInfo for Letter Management
+//CallToPopulateRecipientEmail client side script for Certification
 const CallServerSide = function () {
 
     VV.Form.ShowLoadingPanel();
@@ -6,20 +6,15 @@ const CallServerSide = function () {
     let formData = VV.Form.getFormDataCollection();
 
     let FormInfo = {};
-    FormInfo.name = 'REVISIONID';
-    FormInfo.value = VV.Form.DataID;
+    FormInfo.name = 'USERID';
+    FormInfo.value = VV.Form.VV.currentUser.UsId;
     formData.push(FormInfo);
-
-    let UserInfo = {};
-    UserInfo.name = 'USERID';
-    UserInfo.value = VV.Form.FormUsID;
-    formData.push(UserInfo);
 
     //Following will prepare the collection and send with call to server side script.
     const data = JSON.stringify(formData);
     const requestObject = $.ajax({
         type: "POST",
-        url: VV.BaseAppUrl + 'api/v1/' + VV.CustomerAlias + '/' + VV.CustomerDatabaseAlias + '/scripts?name=LetterManagementRetrieveUserInfo',
+        url: VV.BaseAppUrl + 'api/v1/' + VV.CustomerAlias + '/' + VV.CustomerDatabaseAlias + '/scripts?name=PopulateRecipientEmail',
         contentType: "application/json; charset=utf-8",
         data: data,
         success: '',
@@ -34,12 +29,7 @@ VV.Form.ShowLoadingPanel();
 $.when(
     CallServerSide()
 ).always(function (resp) {
-    //console.log(resp);
-    if ('' == VV.Form.GetFieldValue('Letter HTML')) {
-        VV.Form.SetFieldValue('Letter HTML', VV.Form.GetFieldValue('Default Template Content'), false)
-        VV.Form.SetFieldValue('Subject of Template', 'General Notification');
-    }
-
+    console.log(resp);
     VV.Form.HideLoadingPanel();
     let messageData = '';
     if (typeof (resp.status) != 'undefined') {
@@ -53,17 +43,15 @@ $.when(
     else if (resp.meta.status == '200') {
         if (resp.data[0] != 'undefined') {
             if (resp.data[0] == 'Success') {
-                /*
-                Legend:
-                resp.data[1] = Array List of "State Staff", "Job Leadership" and "Individual Info" objects
-                */
 
-                //The tokens are already set using a template function that runs through the Array of objects that arrives from the Web service
-                const tokens = VV.Form.Template.PopulateDataTokens(resp.data[1]);
-                VV.Form.SetFieldValue('Formatted Data Tokens', tokens);
+                const loadData = resp.data[1];
+                if (loadData) {
+                    //Set field with the Email obtained
+                    VV.Form.SetFieldValue('Recipient Email', loadData);
+                } else {
+                    VV.Form.Global.DisplayMessaging("No results were found for the applicant's Email.");
+                }
 
-                //The tokens are set in this field in string format to be able to merge with the tokens of the letter
-                VV.Form.SetFieldValue('Data Tokens', JSON.stringify(resp.data[1]));
             }
             else if (resp.data[0] == 'Error') {
                 messageData = 'An error was encountered. ' + resp.data[1];
@@ -72,7 +60,7 @@ $.when(
                 alert(messageData);
             }
             else {
-                messageData = 'An unhandled response occurred when calling LetterManagementRetrieveUserInfo. The form will not save at this time.  Please try again or communicate this issue to support.';
+                messageData = 'An unhandled response occurred when calling PopulateFieldsOnLoad. The form will not save at this time.  Please try again or communicate this issue to support.';
                 VV.Form.HideLoadingPanel();
                 //VV.Form.Global.DisplayMessaging(messageData);
                 alert(messageData);

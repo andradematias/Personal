@@ -409,6 +409,10 @@ module.exports.main = async function (ffCollection, vvClient, response) {
                 name: "Individual Info",
                 value: IndividualInfo
             },
+            {
+                name: "Recipient Email",
+                value: RecipientEmail
+            }
         ]
 
         //Step 5. Return Array
